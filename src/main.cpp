@@ -73,28 +73,40 @@ void asservissement(void* parameters)
 }
 
 #include <TMCStepper.h>
+#include <AccelStepper.h>
 #define EN_PIN           5 // Enable
 #define DIR_PIN          19 // Direction
 #define STEP_PIN         18 // Step
 #define SERIAL_PORT Serial2 // TMC2208/TMC2224 HardwareSerial port
 #define R_SENSE 0.11f
+AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
 TMC2208Stepper driver(&SERIAL_PORT, R_SENSE);
 
-#define STEP_PER_REV 200
-#define MICROSTEPS 16
-#define STEPS_PER_TURN STEP_PER_REV * MICROSTEPS
-#define SPEED 2.f
-#define STEPS_PER_SECOND SPEED * STEPS_PER_TURN
-#define STEP_INTERVAL  1e6 / STEPS_PER_SECOND
+const int STEP_PER_REV = 200;
+const int MICROSTEPS = 16;
+const int STEPS_PER_TURN = STEP_PER_REV * MICROSTEPS;
+const float SPEED = 2.f;
+const float STEPS_PER_SECOND = SPEED * STEPS_PER_TURN;
+const float STEP_INTERVAL = (float)1e6 / STEPS_PER_SECOND;
 
+float ouverturevanne = 0; // 0 = ferme, 1 = ouvert
 
 void moteur(void* parameters)
 {
-  pinMode(EN_PIN, OUTPUT);
+  /*pinMode(EN_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
-  digitalWrite(EN_PIN, LOW);
+  digitalWrite(EN_PIN, LOW);*/
 
+  stepper.setMaxSpeed(STEPS_PER_SECOND); // 2 tours/s @ 6400 uSteps/s
+  stepper.setAcceleration(20*STEPS_PER_SECOND); // 40 tours/s/s
+  stepper.setEnablePin(EN_PIN);
+  stepper.setPinsInverted(false, false, true);
+  stepper.enableOutputs();
+
+
+
+  //UART
   SERIAL_PORT.begin(115200);
 
   driver.begin();                 //  SPI: Init CS pins and possible SW SPI pins
@@ -108,18 +120,33 @@ void moteur(void* parameters)
   
   bool shaft = false;
 
+  Serial.printf("Steps per turn : %i, steps per second : %f, step interval : %f", STEPS_PER_TURN, STEPS_PER_SECOND, STEP_INTERVAL);
   for (;;)
   {
-    // Run 5000 steps and switch direction in software
+    ouverturevanne = 10*cos(millis()/1000.f);
+    ouverturevanne = Clamp<float>(ouverturevanne, 0, 1);
+    stepper.moveTo((int)((1-ouverturevanne) * STEPS_PER_TURN /2));
+    stepper.run();
+    /*stepper.moveTo(STEPS_PER_TURN/2);
+    while (stepper.distanceToGo() != 0)
+    {
+      stepper.run();
+    }
+    stepper.moveTo(0);
+    while (stepper.distanceToGo() != 0)
+    {
+      stepper.run();
+    }*/
+    /*// Run 5000 steps and switch direction in software
     for (uint16_t i = STEPS_PER_TURN /2; i>0; i--) {
       digitalWrite(STEP_PIN, HIGH);
-      delayMicroseconds(STEP_INTERVAL/2);
+      delayMicroseconds((int)(STEP_INTERVAL/2));
       digitalWrite(STEP_PIN, LOW);
-      delayMicroseconds(STEP_INTERVAL/2);
+      delayMicroseconds((int)(STEP_INTERVAL/2));
     }
     shaft = !shaft;
     driver.shaft(shaft);
-    //digitalWrite(DIR_PIN, shaft);
+    //digitalWrite(DIR_PIN, shaft);*/
   }
   
   vTaskDelete(NULL);
