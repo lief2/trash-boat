@@ -182,7 +182,7 @@ namespace Asservissement{
       I = Clamp<float>(I + Ki * erreur * deltamicros / 1e6, -AbsIMax, AbsIMax);
       D = Kd * (erreur - erreurprecedente) * 1e6 / deltamicros;
       consigne = P + I + D;
-      Communication::SetOuvertureVanne(consigne);
+      //Communication::SetOuvertureVanne(consigne);
       erreurprecedente = erreur;
       vTaskDelay(1);
     }
@@ -199,46 +199,75 @@ namespace Stepper{
   #define SERIAL_PORT Serial2 // TMC2208/TMC2224 HardwareSerial port
   #define R_SENSE 0.11f
   AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
-  TMC2208Stepper driver(&SERIAL_PORT, R_SENSE);
+  TMC2208Stepper driver(&Serial2, R_SENSE);
 
   const int STEP_PER_REV = 200;
   const int MICROSTEPS = 16;
   const int STEPS_PER_TURN = STEP_PER_REV * MICROSTEPS;
   const float SPEED = 2.f; //tours/s
   const float STEPS_PER_SECOND = STEPS_PER_TURN * SPEED;
+  const int STEP_INTERVAL_US = 1e6 / STEPS_PER_SECOND;
   const float OPEN_ROT = 0; //tours
-  const float CLOSED_ROT = 0.5f; //tours
+  const float CLOSED_ROT = 1.5f; //tours
 
-  void Task(void* parameters)
+  void DriverSetup()
   {
-    //Initialisation du moteur
-    stepper.setMaxSpeed(STEPS_PER_SECOND); // 2 tours/s @ 6400 uSteps/s
-    stepper.setAcceleration(20*STEPS_PER_SECOND); // 40 tours/s/s
-    stepper.setEnablePin(EN_PIN);
-    stepper.setPinsInverted(false, false, true);
-    stepper.enableOutputs();
-
+    pinMode(STEP_PIN, OUTPUT);
+    pinMode(DIR_PIN, OUTPUT);
+    pinMode(EN_PIN, OUTPUT);
+    digitalWrite(EN_PIN, LOW);
     //UART
     SERIAL_PORT.begin(115200);
 
     driver.begin();                 // Initialisation UART
     driver.toff(5);                 // Active le controlleur
     driver.rms_current(400);        // Courant moteur (mA)
-    driver.microsteps(MICROSTEPS);  // Microsteps
+    driver.microsteps(16);  // Microsteps
 
-    driver.en_spreadCycle(false);   // SpreadCycle (plus de bruit, plus de couple que StealthChop)
+    //driver.en_spreadCycle(false);   // SpreadCycle (plus de bruit, plus de couple que StealthChop)
     driver.pwm_autoscale(true);     // Requis pour StealthChop
+
+    Serial.println("UART Initialised");
+  }
+
+  void Task(void* parameters)
+  {
+    //Initialisation du moteur
+    /*stepper.setMaxSpeed(STEPS_PER_SECOND); // 2 tours/s @ 6400 uSteps/s
+    stepper.setAcceleration(20*STEPS_PER_SECOND); // 40 tours/s/s
+    stepper.setEnablePin(EN_PIN);
+    stepper.setPinsInverted(false, false, true);
+    stepper.enableOutputs();*/
+  
+    Serial.println("Stepper Initialised");
+    vTaskDelay(1000/portTICK_PERIOD_MS);
 
     //Boucle
     for (;;)
     {
-      float OuvertureVanne = Communication::GetOuvertureVanne();
+      /*float OuvertureVanne = abs(cos((millis() * 2 * PI) / 1000)); //Communication::GetOuvertureVanne();
       OuvertureVanne = Clamp<float>(OuvertureVanne, 0, 1); //0-1
       float Position = Lerp<float>(OuvertureVanne, CLOSED_ROT, OPEN_ROT); //tours
-      float steps = Position * STEPS_PER_TURN;
-      stepper.moveTo(steps);
-      stepper.run();
-      vTaskDelay(1);
+      int steps = Position * STEPS_PER_TURN;*/
+      int open_steps = STEPS_PER_TURN * OPEN_ROT;
+      int closed_steps = STEPS_PER_TURN * CLOSED_ROT;
+      digitalWrite(DIR_PIN, HIGH);
+      for (int i = 0; i < closed_steps; i++)
+      {
+        digitalWrite(STEP_PIN, HIGH);
+        delayMicroseconds(STEP_INTERVAL_US/2);
+        digitalWrite(STEP_PIN, LOW);
+        delayMicroseconds(STEP_INTERVAL_US/2);
+      }
+      digitalWrite(DIR_PIN, LOW);
+      for (int i = 0; i < closed_steps; i++)
+      {
+        digitalWrite(STEP_PIN, HIGH);
+        delayMicroseconds(STEP_INTERVAL_US/2);
+        digitalWrite(STEP_PIN, LOW);
+        delayMicroseconds(STEP_INTERVAL_US/2);
+      }
+      //vTaskDelay(1);
     }
 
     vTaskDelete(NULL);
@@ -247,6 +276,7 @@ namespace Stepper{
 void setup() {
   Serial.begin(115200);
   Communication::InitSemaphores();
+  Stepper::DriverSetup();
   xTaskCreatePinnedToCore(MesureEau::Task, "Mesures du niveau d'eau", 10000, NULL, 1, NULL, 0);
   xTaskCreatePinnedToCore(MesureAngle::Task, "Mesure de l'angle", 10000, NULL, 1, NULL, 1);
   xTaskCreatePinnedToCore(Asservissement::Task, "Asservissement", 10000, NULL, 1, NULL, 0);

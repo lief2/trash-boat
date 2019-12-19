@@ -8,6 +8,15 @@
 		"terminal.integrated.env.windows": {
 			"PATH": "C:\\Users\\moddi\\.platformio\\penv\\Scripts;C:\\Users\\moddi\\.platformio\\penv;D:\\python27\\;D:\\python27\\Scripts;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\Program Files\\Oculus\\Support\\oculus-runtime;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files (x86)\\Windows Kits\\8.1\\Windows Performance Toolkit\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR;C:\\Program Files\\PuTTY\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;E:\\msys64\\mingw64\\bin;E:\\msys64\\mingw32\\bin;C:\\Users\\moddi\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\moddi\\AppData\\Local\\GitHubDesktop\\bin;C:\\Users\\moddi\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\moddi\\AppData\\Local\\Microsoft\\WindowsApps;D:\\python27\\;D:\\python27\\Scripts;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\Program Files\\Oculus\\Support\\oculus-runtime;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C:\\Program Files (x86)\\Windows Kits\\8.1\\Windows Performance Toolkit\\;C:\\Program Files\\NVIDIA Corporation\\NVIDIA NvDLISR;C:\\Program Files\\PuTTY\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;E:\\msys64\\mingw64\\bin;E:\\msys64\\mingw32\\bin;C:\\Users\\moddi\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\moddi\\AppData\\Local\\GitHubDesktop\\bin;C:\\Users\\moddi\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\moddi\\AppData\\Local\\Microsoft\\WindowsApps",
 			"PLATFORMIO_CALLER": "vscode"
+		},
+		"files.associations": {
+			"array": "cpp",
+			"deque": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"vector": "cpp",
+			"initializer_list": "cpp"
 		}
 	}
 }
