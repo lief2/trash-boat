@@ -1,0 +1,1 @@
+void MesureAngle_Task(void* Parameters);
