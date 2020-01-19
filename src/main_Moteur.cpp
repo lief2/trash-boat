@@ -36,10 +36,12 @@ void Moteur_Task(void* parameters)
     stepper.setEnablePin(EN_PIN);
     stepper.setPinsInverted(false, false, true);
     stepper.enableOutputs();
+    stepper.setMinPulseWidth(100);
 
     Serial.println("Stepper Initialised");
     vTaskDelay(1000/portTICK_PERIOD_MS);
-
+    //long lastreport = millis();
+    //long ticks = 0;
     //Boucle
     for (;;)
     {
@@ -51,7 +53,14 @@ void Moteur_Task(void* parameters)
             stepper.moveTo(steps);
         }
         stepper.run();
-
+        /*ticks++;
+        long time = millis()-lastreport;
+        if(time >= 60*1000)
+        {
+            Serial.printf("Done %li ticks in %li millis\r\n", ticks, time);
+            lastreport = millis();
+            ticks = 0;
+        }*/
         /*int open_steps = STEPS_PER_TURN * OPEN_ROT;
         int closed_steps = STEPS_PER_TURN * CLOSED_ROT;
         digitalWrite(DIR_PIN, HIGH);
