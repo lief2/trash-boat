@@ -10,6 +10,7 @@
 void setup() {
   Serial.begin(115200);
   Communication_Setup();
+  MesureAngle_Setup();
   Moteur_Setup();
   xTaskCreatePinnedToCore(MesureEau_Task, "Mesures du niveau d'eau", 10000, NULL, 1, NULL, 0);
   xTaskCreatePinnedToCore(MesureAngle_Task, "Mesure de l'angle", 10000, NULL, 1, NULL, 1);

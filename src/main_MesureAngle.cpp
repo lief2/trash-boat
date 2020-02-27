@@ -13,11 +13,15 @@
 
 MPU6050 mpu6050(Wire);
 
-void MesureAngle_Task(void* Parameters)
+void MesureAngle_Setup()
 {
     Wire.begin(SDA, SCL, 400000L);
     mpu6050.begin();
     mpu6050.calcGyroOffsets(true, 0, 0);
+}
+
+void MesureAngle_Task(void* Parameters)
+{
     double x1,t1,x2,t2,x3=NAN,t3;
     for (;;)
     {
