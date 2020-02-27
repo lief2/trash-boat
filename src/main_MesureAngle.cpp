@@ -39,6 +39,8 @@ void MesureAngle_Task(void* Parameters)
                 SetGyroData(Omega, Phase);
             }
         }
+        
+        delay(100);
     }
     
     vTaskDelete(NULL);
