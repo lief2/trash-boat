@@ -1,13 +1,13 @@
 void Communication_Setup();
 
-float GetNiveauEau();
-bool GetNiveauEauNonBlocking(float &NiveauEauOut);
-void SetNiveauEau(float NewValue);
+bool GetEauData(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut);
+bool GetEauDataNonBlocking(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut);
+void SetEauData(double NewFrequence, double NewPhase, double NewTempsMesure);
 
-bool GetGyroData(float &FrequenceOut, float& PhaseOut);
-bool GetGyroDataNonBlocking(float &FrequenceOut, float& PhaseOut);
-void SetGyroData(float NewFrequence, float NewPhase);
+bool GetAngleData(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut);
+bool GetAngleDataNonBlocking(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut);
+void SetAngleData(double NewFrequence, double NewPhase, double NewTempsMesure);
 
-float GetOuvertureVanne();
-bool GetOuvertureVanneNonBlocking(float& OuvertureVanneOut);
-void SetOuvertureVanne(float NewValue);
+double GetOuvertureVanne();
+bool GetOuvertureVanneNonBlocking(double& OuvertureVanneOut);
+void SetOuvertureVanne(double NewValue);

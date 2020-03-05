@@ -2,52 +2,39 @@
 #include "main_Config.h"
 #include "main_Communication.h"
 
-const int Pins[] = {36, 39, 34, 35, 32, 33, 25, 26, 27, 14, 12, 13, 15, 2, 4};
-const int PinsLen = sizeof(Pins) / sizeof(int);
+#include "math/math_Derivation.h"
+#include "math/math_Phase.h"
+
+
 void MesureEau_Task(void* parameters)
 {
-    /*int Mesures[PinsLen], deltas[PinsLen-1];
-    for (;;)
+    for (int i = 0; i < PinsMesureEauLen; i++)
     {
-        int PlusGrand = 0, SecondPlusGrand = 0;
-        for (int i = 0; i < PinsLen; i++)
-        {
-        Mesures[i] = analogRead(Pins[i]);
-        }
-        for (int i = 0; i < PinsLen - 1; i++)
-        {
-        deltas[i] = abs(Mesures[i + 1] - Mesures[i]);
-        }
-        for (int i = 0; i < PinsLen - 1; i++)
-        {
-        if(deltas[i] > deltas[PlusGrand])
-        {
-            SecondPlusGrand = PlusGrand;
-            PlusGrand = i;
-        }
-        else if (deltas[i] > deltas[SecondPlusGrand])
-        {
-            SecondPlusGrand = i;
-        }
-        }
-        float ChangementNiveau = deltas[SecondPlusGrand] / (2.f * deltas[PlusGrand]) * (SecondPlusGrand - PlusGrand) + PlusGrand;
-        //Serial.printf("Changement de niveau a %f \r\n", ChangementNiveau);
-        SetNiveauEau(ChangementNiveau / (PinsLen - 1));
-        vTaskDelay(1);
-    }*/
-    pinMode(4, INPUT);
-    for (;;)
-    {
-        int value = analogRead(4);
-        //Serial.print("Value : ");
-        /*for (int i = 0; i<value/32; i++)
-        {
-            Serial.print(".");
-        }
-        Serial.println("");*/
-        //Serial.println(value);
-        delay(10);
+        pinMode(PinsMesureEau[i], INPUT);
     }
+
+    double x1=0,t1=0,x2=0,t2=0,x3=NAN,t3=0;
+
+    for (;;)
+    {
+        //Faire la mesure
+
+        double time = ((double)micros()) / 1000000.0;
+        double angle = 1;
+        x3=x2; t3=t2; x2=x1; t2=t1; x1=angle; t1=time;
+        if(!isnan(x3))
+        {
+            double dx = GetFirstDerivative(x1,t1,x2,t2);
+            double d2x = GetSecondDerivative(x1,t1,x2,t2,x3,t3);
+            double Amplitude, Omega, Phase;
+            if(GetSinusProperties(x1, dx, d2x, Amplitude, Omega, Phase))
+            {
+                SetEauData(Omega, Phase, (t1+t2+t3)/3);
+            }
+        }
+        delay(100);
+    }
+    
     
     vTaskDelete(NULL);
 }

@@ -4,36 +4,22 @@
 
 #include <AccelStepper.h>
 
-#define EN_PIN           5 // Enable
-#define DIR_PIN          19 // Direction
-#define STEP_PIN         18 // Step
-#define SERIAL_PORT Serial2 // TMC2208/TMC2224 HardwareSerial port
-#define R_SENSE 0.11f
-AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
-
-const int STEP_PER_REV = 200;
-const int MICROSTEPS = 16;
-const int STEPS_PER_TURN = STEP_PER_REV * MICROSTEPS;
-const float SPEED = 2.f; //tours/s
-const float STEPS_PER_SECOND = STEPS_PER_TURN * SPEED;
-const int STEP_INTERVAL_US = 1e6 / STEPS_PER_SECOND;
-const float OPEN_ROT = 0; //tours
-const float CLOSED_ROT = 1.5f; //tours
+AccelStepper stepper = AccelStepper(stepper.DRIVER, Pin_Step_Moteur, Pin_Direction_Moteur);
 
 void Moteur_Setup()
 {
-    pinMode(STEP_PIN, OUTPUT);
-    pinMode(DIR_PIN, OUTPUT);
-    pinMode(EN_PIN, OUTPUT);
-    digitalWrite(EN_PIN, LOW);
+    pinMode(Pin_Step_Moteur, OUTPUT);
+    pinMode(Pin_Direction_Moteur, OUTPUT);
+    pinMode(Pin_Enable_Moteur, OUTPUT);
+    digitalWrite(Pin_Enable_Moteur, LOW);
 }
 
 void Moteur_Task(void* parameters)
 {
     //Initialisation du moteur
-    stepper.setMaxSpeed(STEPS_PER_SECOND); // 2 tours/s @ 6400 uSteps/s
-    stepper.setAcceleration(20*STEPS_PER_SECOND); // 40 tours/s/s
-    stepper.setEnablePin(EN_PIN);
+    stepper.setMaxSpeed(ImpulsionsParSeconde_Moteur); // 2 tours/s @ 6400 uSteps/s
+    stepper.setAcceleration(20*ImpulsionsParSeconde_Moteur); // 40 tours/s/s
+    stepper.setEnablePin(Pin_Enable_Moteur);
     stepper.setPinsInverted(false, false, true);
     stepper.enableOutputs();
     stepper.setMinPulseWidth(100);
@@ -45,11 +31,11 @@ void Moteur_Task(void* parameters)
     //Boucle
     for (;;)
     {
-        float OuvertureVanne;
+        double OuvertureVanne;
         if(GetOuvertureVanneNonBlocking(OuvertureVanne))
         {
-            float Position = Lerp<float>(OuvertureVanne, CLOSED_ROT, OPEN_ROT);
-            int steps = Position * STEPS_PER_TURN;
+            float Position = Lerp<float>(OuvertureVanne, RotationFerme_Moteur, RotationOuvert_Moteur);
+            int steps = Position * MicroimpulsionsParTourMoteur;
             stepper.moveTo(steps);
         }
         stepper.run();
@@ -61,23 +47,23 @@ void Moteur_Task(void* parameters)
             lastreport = millis();
             ticks = 0;
         }*/
-        /*int open_steps = STEPS_PER_TURN * OPEN_ROT;
-        int closed_steps = STEPS_PER_TURN * CLOSED_ROT;
-        digitalWrite(DIR_PIN, HIGH);
+        /*int open_steps = MicroimpulsionsPaRotationOuvert_Moteureur * OPEN_ROT;
+        int closed_steps = MicroimpulsionsPaRotationFerme_Moteurr * CLOSED_ROT;
+        digitalWrite(Pin_Direction_Moteur, HIGH);
         for (int i = 0; i < closed_steps; i++)
         {
-        digitalWrite(STEP_PIN, HIGH);
-        delayMicroseconds(STEP_INTERVAL_US/2);
-        digitalWrite(STEP_PIN, LOW);
-        delayMicroseconds(STEP_INTERVAL_US/2);
+        digitalWrite(Pin_Step_Moteur, HIGH);
+        delayMicroseconds(IntervalImpulsion_Moteur/2);
+        digitalWrite(Pin_Step_Moteur, LOW);
+        delayMicroseconds(IntervalImpulsion_Moteur/2);
         }
-        digitalWrite(DIR_PIN, LOW);
+        digitalWrite(Pin_Direction_Moteur, LOW);
         for (int i = 0; i < closed_steps; i++)
         {
-        digitalWrite(STEP_PIN, HIGH);
-        delayMicroseconds(STEP_INTERVAL_US/2);
-        digitalWrite(STEP_PIN, LOW);
-        delayMicroseconds(STEP_INTERVAL_US/2);
+        digitalWrite(Pin_Step_Moteur, HIGH);
+        delayMicroseconds(IntervalImpulsion_Moteur/2);
+        digitalWrite(Pin_Step_Moteur, LOW);
+        delayMicroseconds(IntervalImpulsion_Moteur/2);
         }*/
         //vTaskDelay(1);
     }

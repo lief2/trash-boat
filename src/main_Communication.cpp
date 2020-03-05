@@ -1,14 +1,17 @@
 #include "main_Config.h"
 
 SemaphoreHandle_t SemaphoreMesureEau;
-float NiveauEau = 0;
+double EauFrequence = 0;
+double EauPhase = 0;
+double EauTempsMesure = 0;
 
 SemaphoreHandle_t SemaphoreMesureAngle;
-float Frequence = 0;
-float Phase = 0;
+double AngleFrequence = 0;
+double AnglePhase = 0;
+double AngleTempsMesure = 0;
 
 SemaphoreHandle_t SemaphoreInstruction;
-float OuvertureVanne = 0; // 0 = ferme, 1 = ouvert
+double OuvertureVanne = 0; // 0 = ferme, 1 = ouvert
 
 const int WaitPeriod = 100/portTICK_PERIOD_MS;
 
@@ -22,73 +25,85 @@ void Communication_Setup()
     xSemaphoreGive(SemaphoreInstruction);
 }
 
-float GetNiveauEau()
+bool GetEauData(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut)
 {
-    xSemaphoreTake(SemaphoreMesureEau, WaitPeriod);
-    float tempNiveau = NiveauEau;
-    xSemaphoreGive(SemaphoreMesureEau);
-    return tempNiveau;
-}
-
-bool GetNiveauEauNonBlocking(float &NiveauEauOut)
-{
-    if(xSemaphoreTake(SemaphoreMesureEau, 0) == pdTRUE)
+    if(xSemaphoreTake(SemaphoreMesureEau, WaitPeriod) == pdTRUE)
     {
-        NiveauEauOut = NiveauEau;
+        FrequenceOut = EauFrequence;
+        PhaseOut = EauPhase;
+        TempsMesureOut = EauTempsMesure;
         xSemaphoreGive(SemaphoreMesureEau);
         return true;
     }
     return false;
 }
 
-void SetNiveauEau(float NewValue)
+bool GetEauDataNonBlocking(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut)
+{
+    if(xSemaphoreTake(SemaphoreMesureEau, 0) == pdTRUE)
+    {
+        FrequenceOut = EauFrequence;
+        PhaseOut = EauPhase;
+        TempsMesureOut = EauTempsMesure;
+        xSemaphoreGive(SemaphoreMesureEau);
+        return true;
+    }
+    return false;
+}
+
+void SetEauData(double NewFrequence, double NewPhase, double NewTempsMesure)
 {
     xSemaphoreTake(SemaphoreMesureEau, WaitPeriod);
-    NiveauEau = NewValue;
+    EauFrequence = NewFrequence;
+    EauPhase = NewPhase;
+    EauTempsMesure = NewTempsMesure;
     xSemaphoreGive(SemaphoreMesureEau);
 }
 
-bool GetGyroData(float &FrequenceOut, float& PhaseOut)
+bool GetAngleData(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut)
 {
     if(xSemaphoreTake(SemaphoreMesureAngle, WaitPeriod) == pdTRUE)
     {
-        FrequenceOut = Frequence;
-        PhaseOut = Phase;
+        FrequenceOut = AngleFrequence;
+        PhaseOut = AnglePhase;
+        TempsMesureOut = AngleTempsMesure;
         xSemaphoreGive(SemaphoreMesureAngle);
         return true;
     }
     return false;
 }
 
-bool GetGyroDataNonBlocking(float &FrequenceOut, float& PhaseOut)
+bool GetAngleDataNonBlocking(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut)
 {
     if(xSemaphoreTake(SemaphoreMesureAngle, 0) == pdTRUE)
     {
-        FrequenceOut = Frequence;
-        PhaseOut = Phase;
+        FrequenceOut = AngleFrequence;
+        PhaseOut = AnglePhase;
+        TempsMesureOut = AngleTempsMesure;
         xSemaphoreGive(SemaphoreMesureAngle);
         return true;
     }
     return false;
 }
 
-void SetGyroData(float NewFrequence, float NewPhase)
+void SetAngleData(double NewFrequence, double NewPhase, double NewTempsMesure)
 {
     xSemaphoreTake(SemaphoreMesureAngle, WaitPeriod);
-    Frequence = NewFrequence;
-    Phase = NewPhase;
+    AngleFrequence = NewFrequence;
+    AnglePhase = NewPhase;
+    AngleTempsMesure = NewTempsMesure;
     xSemaphoreGive(SemaphoreMesureAngle);
 }
 
-float GetOuvertureVanne()
+double GetOuvertureVanne()
 {
     xSemaphoreTake(SemaphoreInstruction, WaitPeriod);
-    float tempOuverture = OuvertureVanne;
+    double tempOuverture = OuvertureVanne;
     xSemaphoreGive(SemaphoreInstruction);
     return tempOuverture;
 }
 
-bool GetOuvertureVanneNonBlocking(float& OuvertureVanneOut)
+bool GetOuvertureVanneNonBlocking(double& OuvertureVanneOut)
 {
     if(xSemaphoreTake(SemaphoreInstruction, 0))
     {
@@ -99,9 +114,9 @@ bool GetOuvertureVanneNonBlocking(float& OuvertureVanneOut)
     return false;
 }
 
-void SetOuvertureVanne(float NewValue)
+void SetOuvertureVanne(double NewValue)
 {
     xSemaphoreTake(SemaphoreInstruction, WaitPeriod);
-    OuvertureVanne = Clamp<float>(NewValue, 0, 1);
+    OuvertureVanne = Clamp<double>(NewValue, 0, 1);
     xSemaphoreGive(SemaphoreInstruction);
 }

@@ -22,7 +22,7 @@ void MesureAngle_Setup()
 
 void MesureAngle_Task(void* Parameters)
 {
-    double x1,t1,x2,t2,x3=NAN,t3;
+    double x1=0,t1=0,x2=0,t2=0,x3=NAN,t3=0;
     for (;;)
     {
         mpu6050.update();
@@ -36,7 +36,7 @@ void MesureAngle_Task(void* Parameters)
             double Amplitude, Omega, Phase;
             if(GetSinusProperties(x1, dx, d2x, Amplitude, Omega, Phase))
             {
-                SetGyroData(Omega, Phase);
+                SetAngleData(Omega, Phase, (t1+t2+t3)/3);
             }
         }
     }
