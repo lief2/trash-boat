@@ -39,6 +39,8 @@ void MesureAngle_Task(void* Parameters)
                 SetAngleData(Omega, Phase, (t1+t2+t3)/3);
             }
         }
+        
+        delay(100);
     }
     
     vTaskDelete(NULL);
