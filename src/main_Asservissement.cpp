@@ -15,8 +15,8 @@ void Asservissement_Task(void* parameters)
     {
         GetAngleDataNonBlocking(FrequenceAngle, PhaseAngle, TempsAngle);
         double TempsActuel = ((float)millis())/1000.0;
-        double PhaseActuelleAngle = PhaseAngle + FrequenceAngle * (TempsActuel-TempsAngle);
-        double PhaseActuelleEau = PhaseEau + FrequenceEau * (TempsActuel-TempsAngle);
+        double PhaseActuelleAngle = PhaseAngle + FrequenceAngle * TWO_PI * (TempsActuel-TempsAngle);
+        double PhaseActuelleEau = PhaseEau + FrequenceEau * TWO_PI * (TempsActuel-TempsAngle);
         erreur = cibleDecalage - GetDeltaPhase(PhaseActuelleAngle, PhaseActuelleEau);
         long long unsigned int deltamicros = micros() - microsprecedente;
         microsprecedente = micros();

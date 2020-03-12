@@ -4,7 +4,7 @@ private:
 	const int ArrayLength = 256;
     double* Values = new double[ArrayLength];
 	double* Times = new double[ArrayLength];
-	double SumOfAllValues = 0;
+	double MaxValue, MinValue;
 	int LastRegisteredValueIndex = -1;
 public:
     math_Phase(/* args */);
@@ -12,10 +12,16 @@ public:
 	void AddDataPoint(double value, double time);
 	double GetValueRelative(int index)
 	{
-		return Values[index]; //- SumOfAllValues/(LastRegisteredValueIndex+1);
+		return Values[index] - (MaxValue+MinValue)/2.0;
 	}
-	void GetZeroCrossings(double* Positive, double* Negative);
-	double GetFrequency();
+	bool GetZeroCrossings(double* Positive, double* Negative); //les evenements les plus recents sont en premier
+	double GetFrequency(double* Positive, double* Negative);
+	double GetPhase(double* Positive, double* Negative, double Frequency, double time);
+	double GetAmplitude()
+	{
+		return (MaxValue - MinValue)/2.0;
+	}
+	bool GetFrequencyPhaseAmplitude(double Time, double& Frequency, double& Phase, double& Amplitude);
 };
 
 /*
