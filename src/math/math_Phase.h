@@ -1,3 +1,23 @@
+class math_Phase
+{
+private:
+	const int ArrayLength = 256;
+    double* Values = new double[ArrayLength];
+	double* Times = new double[ArrayLength];
+	double SumOfAllValues = 0;
+	int LastRegisteredValueIndex = -1;
+public:
+    math_Phase(/* args */);
+    ~math_Phase();
+	void AddDataPoint(double value, double time);
+	double GetValueRelative(int index)
+	{
+		return Values[index]; //- SumOfAllValues/(LastRegisteredValueIndex+1);
+	}
+	void GetZeroCrossings(double* Positive, double* Negative);
+	double GetFrequency();
+};
+
 /*
 x is the value
 dx is the first derivative of the value

@@ -40,3 +40,15 @@ T Lerp(T alpha, T a, T b)
 {
   return a + alpha * (b-a);
 }
+
+template<class T>
+T InverseLerp(T x, T a, T b)
+{
+  return (x-a)/(b-a);
+}
+
+template<class T>
+T Map(T x, T InA, T InB, T OutA, T OutB)
+{
+  return Lerp(InverseLerp(x, InA, InB), OutA, OutB);
+}
