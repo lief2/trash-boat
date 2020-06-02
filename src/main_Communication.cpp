@@ -1,3 +1,4 @@
+#include "main_Communication.h"
 #include "main_Config.h"
 
 SemaphoreHandle_t SemaphoreMesureEau;
@@ -25,7 +26,7 @@ void Communication_Setup()
     xSemaphoreGive(SemaphoreInstruction);
 }
 
-bool GetEauData(double &FrequenceOut, double& PhaseOut, double& TempsMesureOut)
+bool GetEauData(double& FrequenceOut, double& PhaseOut, double& TempsMesureOut)
 {
     if(xSemaphoreTake(SemaphoreMesureEau, WaitPeriod) == pdTRUE)
     {
